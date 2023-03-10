@@ -40,7 +40,8 @@ export const LanguageSelector: React.FC = () => {
                     {languages.map(lng => (
                         <Link 
                             key={lng} 
-                            href={router.asPath} 
+                            href='/'
+                            // href={router.asPath} 
                             locale={lng} 
                             style={{ width: 130 }} 
                             className='flex gap-2 items-center cursor-pointer'
