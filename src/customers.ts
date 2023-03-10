@@ -89,6 +89,24 @@ export const customers: Customer[] = [
                         "Husk, at at sladre kan være en vanskelig og kompleks proces, men det kan også hjælpe med at forhindre skade og fremme etisk adfærd på arbejdspladsen.",
                     ].join('\n')
                 }
+            ],
+            'es': [
+                {
+                    title: 'Investigación',
+                    content: 'Bienvenido a la plataforma de denunciantes de RelateIT A/S',
+                },
+                {
+                    title: 'Sopla el silbato',
+                    content: [
+                        "Chismear significa informar sobre comportamientos incorrectos o poco éticos que hayas observado o que tengas conocimiento. Aquí hay algunos pasos a considerar cuando chismoseas:",
+                        "1. Recopila evidencia: Recopila todas las pruebas posibles para respaldar tus afirmaciones. Esto puede incluir documentos, correos electrónicos, videos y otras formas de pruebas.",
+                        "2. Sigue los canales adecuados: Identifica los canales apropiados para informar sobre el comportamiento incorrecto. Esto puede ser tu jefe, el departamento de recursos humanos o una línea de denuncia anónima. Sigue los procedimientos descritos por tu organización para informar sobre el abuso.",
+                        "3. Prepárate para posibles represalias: Los chismosos a menudo son objeto de represalias, como acoso, discriminación o incluso despido. Asegúrate de estar consciente de tus derechos y protecciones legales antes de chismosear.",
+                        "4. Mantén la confidencialidad: Es importante mantener la información confidencial hasta que se hayan informado a las autoridades adecuadas. Ten cuidado de no discutir el caso con nadie que no esté directamente involucrado en la investigación.",
+                        "5. Busca asesoramiento legal: Consulta con un abogado especializado en casos de denunciantes para asegurarte de estar protegido por la ley y para entender tus derechos y obligaciones.",
+                        "Recuerda que chismosear puede ser un proceso difícil y complejo, pero también puede ayudar a prevenir daños y promover comportamientos éticos en el lugar de trabajo.",
+                    ].join('\n')
+                }
             ]
         }
     }

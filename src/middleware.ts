@@ -21,12 +21,4 @@ export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   url.pathname = `/_sites/${subdomain}${url.pathname}`;
   return NextResponse.rewrite(url);
-
-//   if (req.nextUrl.locale === 'default') {
-//     const locale = req.cookies.get('NEXT_LOCALE')?.value || 'en'
-
-//     return NextResponse.redirect(
-//       new URL(`/${locale}${req.nextUrl.pathname}${req.nextUrl.search}`, req.url)
-//     )
-//   }
 }

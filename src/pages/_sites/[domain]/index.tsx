@@ -1,4 +1,5 @@
 import { LanguageSelector } from '@/components/language-selector';
+import { PageContainer } from '@/components/page-container';
 import { customers } from '@/customers';
 import { customPageTitleToPath } from '@/lib/utils';
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next'
@@ -12,6 +13,7 @@ export type FrontpageProps = {
     title: string;
     path: string;
   }>;
+  languageOptions: string[],
   page: {
     title: string;
     content: string;
@@ -32,7 +34,7 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
   if (customer == null) throw new Error(`Could not find a customer with the domain of ${domain}`);
 
   const localePages = customer.pages[locale];
-  if (localePages == null || localePages.length === 0) 
+  if (localePages == null || localePages.length === 0)
     throw new Error(`${customer.name} has no translations for ${locale}`);
 
   const page = localePages[0];
@@ -40,6 +42,7 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
   return {
     props: {
       customerName: customer.name,
+      languageOptions: Object.keys(customer.pages),
       pages: localePages.map(page => ({
         title: page.title,
         path: customPageTitleToPath(page.title),
@@ -63,24 +66,18 @@ export const getStaticPaths: GetStaticPaths<PathsResult> = async () => {
   }
 }
 
-const Home: NextPage<FrontpageProps> = ({ customerName, page, pages }) => {
+const Home: NextPage<FrontpageProps> = ({ customerName, page, pages, languageOptions }) => {
   const { t } = useTranslation();
 
   return (
-    <>
-      <div className='flex items-center justify-between'>
-        <div />
-        <h1>{customerName}</h1>
-        <LanguageSelector />
-      </div>
-
+    <PageContainer languageOptions={languageOptions} customerName={customerName}>
       <p>{t('hello')}</p>
 
       <div className='flex gap-4'>
         {pages.map(p => (
           <Link
             key={p.path}
-            className={page.title === p.title ? `text-blue-800` : 'text-blue-300'} 
+            className={page.title === p.title ? `text-blue-800` : 'text-blue-300'}
             href={'/' + p.path}
           >
             {p.title}
@@ -92,7 +89,9 @@ const Home: NextPage<FrontpageProps> = ({ customerName, page, pages }) => {
       <article>
         {page.content}
       </article>
-    </>
+
+      <Link href="/other-page">Other page</Link>
+    </PageContainer>
   )
 }
 

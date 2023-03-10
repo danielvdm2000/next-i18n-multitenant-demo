@@ -24,14 +24,13 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
     const localePages = customer.pages[locale];
     if (localePages == null || localePages.length === 0) return { notFound: true };
 
-    console.log({localePages})
-
     const page = localePages.find(p => customPageTitleToPath(p.title) === customPageTitleToPath(route));
     if (page == null) return { notFound: true };
 
     return {
         props: {
             customerName: customer.name,
+            languageOptions: Object.keys(customer.pages),
             pages: localePages.map(page => ({
                 title: page.title,
                 path: customPageTitleToPath(page.title),
@@ -57,7 +56,7 @@ export const getStaticPaths: GetStaticPaths<PathsResult> = async () => {
                 }))
             )
         );
-        
+
     return {
         paths,
         fallback: 'blocking',
