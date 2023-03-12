@@ -1,5 +1,5 @@
-import { customers } from "@/customers";
-import { customPageTitleToPath } from "@/lib/utils";
+import { customerProvider } from "@/customer-provider";
+import { customPageTitleToPath, unique } from "@/lib/utils";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { FrontpageProps } from ".";
@@ -18,11 +18,11 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
     const route = params?.route;
     if (route == null) throw new Error("route is undefined");
 
-    const customer = customers.find(c => c.domain === domain);
+    const customer = await customerProvider.getCustomerByDomain(domain);
     if (customer == null) return { notFound: true };
 
-    const localePages = customer.pages[locale];
-    if (localePages == null || localePages.length === 0) return { notFound: true };
+    const localePages = customer.pages.filter(p => p.lang === locale);
+    if (localePages.length === 0) return { notFound: true };
 
     const page = localePages.find(p => customPageTitleToPath(p.title) === customPageTitleToPath(route));
     if (page == null) return { notFound: true };
@@ -30,7 +30,7 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
     return {
         props: {
             customerName: customer.name,
-            languageOptions: Object.keys(customer.pages),
+            languageOptions: customer.pages.map(p => p.lang).filter(unique),
             pages: localePages.map(page => ({
                 title: page.title,
                 path: customPageTitleToPath(page.title),
@@ -44,17 +44,17 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
 }
 
 export const getStaticPaths: GetStaticPaths<PathsResult> = async () => {
+    const customers = await customerProvider.getCustomers();
+
     const paths = customers
-        .flatMap(customer => Object.entries(customer.pages)
-            .flatMap(([lng, pages]) =>
-                pages.map(page => ({
-                    locale: lng,
-                    params: {
-                        domain: customer.domain,
-                        route: customPageTitleToPath(page.title),
-                    }
-                }))
-            )
+        .flatMap(customer => customer.pages
+            .map(page => ({
+                locale: page.lang,
+                params: {
+                    domain: customer.domain,
+                    route: customPageTitleToPath(page.title),
+                }
+            }))
         );
 
     return {

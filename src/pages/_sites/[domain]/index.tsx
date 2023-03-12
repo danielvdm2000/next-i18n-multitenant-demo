@@ -1,7 +1,6 @@
-import { LanguageSelector } from '@/components/language-selector';
 import { PageContainer } from '@/components/page-container';
-import { customers } from '@/customers';
-import { customPageTitleToPath } from '@/lib/utils';
+import { customerProvider } from '@/customer-provider';
+import { customPageTitleToPath, unique } from '@/lib/utils';
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -30,11 +29,11 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
   const domain = params?.domain;
   if (domain == null) throw new Error("domain is undefined");
 
-  const customer = customers.find(c => c.domain === domain);
+  const customer = await customerProvider.getCustomerByDomain(domain);
   if (customer == null) throw new Error(`Could not find a customer with the domain of ${domain}`);
 
-  const localePages = customer.pages[locale];
-  if (localePages == null || localePages.length === 0)
+  const localePages = customer.pages.filter(p => p.lang === locale);
+  if (localePages.length === 0)
     throw new Error(`${customer.name} has no translations for ${locale}`);
 
   const page = localePages[0];
@@ -42,7 +41,7 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
   return {
     props: {
       customerName: customer.name,
-      languageOptions: Object.keys(customer.pages),
+      languageOptions: customer.pages.map(p => p.lang).filter(unique),
       pages: localePages.map(page => ({
         title: page.title,
         path: customPageTitleToPath(page.title),
@@ -56,6 +55,8 @@ export const getStaticProps: GetStaticProps<FrontpageProps, PathsResult> = async
 }
 
 export const getStaticPaths: GetStaticPaths<PathsResult> = async () => {
+  const customers = await customerProvider.getCustomers();
+
   return {
     paths: customers.map(customer => ({
       params: {

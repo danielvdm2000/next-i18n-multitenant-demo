@@ -1,5 +1,6 @@
 import { PageContainer } from "@/components/page-container";
-import { customers } from "@/customers";
+import { customerProvider } from "@/customer-provider";
+import { unique } from "@/lib/utils";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -14,6 +15,8 @@ type PathsResult = {
 }
 
 export const getStaticPaths: GetStaticPaths<PathsResult> = async () => {
+    const customers = await customerProvider.getCustomers();
+
     return {
         paths: customers.map(customer => ({
             params: {
@@ -30,13 +33,13 @@ export const getStaticProps: GetStaticProps<Props, PathsResult> = async ({ local
     const domain = params?.domain;
     if (domain == null) throw new Error('domain is undefined');
 
-    const customer = customers.find(c => c.domain === domain);
+    const customer = await customerProvider.getCustomerByDomain(domain);
     if (customer == null) return { notFound: true };
 
     return {
         props: {
             customerName: customer.name,
-            languageOptions: Object.keys(customer.pages),
+            languageOptions: customer.pages.map(p => p.lang).filter(unique),
             ...(await serverSideTranslations(locale, [
                 'common',
             ]))
